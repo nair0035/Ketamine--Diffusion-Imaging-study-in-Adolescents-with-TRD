@@ -1,2 +1,2 @@
 # Ketamine--Diffusion-Imaging-study-in-Adolescents-with-TRD
-This is a Diffusion Imaging study in adolescents with Treatment Resistant Depression who underwent a ketamine trial
+This is a Diffusion Imaging study in adolescents with Treatment Resistant Depression who underwent a ketamine trial. Imaging data were collected before and after a 2-week treatment period during which participants were given 6 serial intravenous ketamine infusions. The aim of this study was to better undertsnand ketamine's antidepressant mechanism by identifying white matter response predictors and ketamine-induced changes in structural connecitivty. 
