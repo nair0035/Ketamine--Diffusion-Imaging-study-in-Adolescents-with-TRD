@@ -1,0 +1,1128 @@
+---
+title: "R Final Project"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+###clinical
+```{r clinical}
+#import clinical data
+clinical <- read.csv("C:/Users/aparn/Desktop/ketamine data/ketamine_demo_cdrs.csv")
+#N=0, R=1
+```
+###FA
+```{r FA}
+#import FA data
+FAdata <- read.csv("C:/Users/aparn/Desktop/ketamine data/258_FA.csv")
+
+library(tidyr)
+#separate pre and post imaging
+FApre<-subset(FAdata, FAdata$time=="pre")
+FApost<-subset(FAdata, FAdata$time=="post")
+
+#rename columns with pre/post
+colnames(FApre) [5:46]<- paste0("pre_", colnames(FApre)[5:46])
+colnames(FApost) [5:46]<- paste0("post_", colnames(FApost)[5:46])
+
+library(dplyr)
+
+#join pre and post by number into FA
+FA<-left_join(FApre, FApost, by="Number")
+
+#join FA and clinical into clinicalFA
+clinicalFA<-left_join(clinical, FA, by="Number")
+```
+
+```{r change in FA}
+#ch_whiteMatter column is change in FA from pre to post; +ve is increase, -ve is decrease  in FA
+change<-function (colPre, colPost){colPost-colPre}
+
+clinicalFA$ch_ac<-change(clinicalFA$pre_ac,clinicalFA$post_ac)
+clinicalFA$ch_af_l<-change(clinicalFA$pre_af_l,clinicalFA$post_af_l)
+clinicalFA$ch_af_r<-change(clinicalFA$pre_af_r,clinicalFA$post_af_r)
+clinicalFA$ch_ar_l<-change(clinicalFA$pre_ar_l,clinicalFA$post_ar_l)
+clinicalFA$ch_ar_r<-change(clinicalFA$pre_ar_r,clinicalFA$post_ar_r)
+clinicalFA$ch_atr_l<-change(clinicalFA$pre_atr_l,clinicalFA$post_atr_l)
+clinicalFA$ch_atr_r<-change(clinicalFA$pre_atr_r,clinicalFA$post_atr_r)
+clinicalFA$ch_cbd_l<-change(clinicalFA$pre_cbd_l,clinicalFA$post_cbd_l)
+clinicalFA$ch_cbd_r<-change(clinicalFA$pre_cbd_r,clinicalFA$post_cbd_r)
+clinicalFA$ch_cbp_l<-change(clinicalFA$pre_cbp_l,clinicalFA$post_cbp_l)
+clinicalFA$ch_cbp_r<-change(clinicalFA$pre_cbp_r,clinicalFA$post_cbp_r)
+clinicalFA$ch_cbt_l<-change(clinicalFA$pre_cbt_l,clinicalFA$post_cbt_l)
+clinicalFA$ch_cbt_r<-change(clinicalFA$pre_cbt_r,clinicalFA$post_cbt_r)
+clinicalFA$ch_cst_l<-change(clinicalFA$pre_cst_l,clinicalFA$post_cst_l)
+clinicalFA$ch_cst_r<-change(clinicalFA$pre_cst_r,clinicalFA$post_cst_r)
+clinicalFA$ch_fa_l<-change(clinicalFA$pre_fa_l,clinicalFA$post_fa_l)
+clinicalFA$ch_fa_r<-change(clinicalFA$pre_fa_r,clinicalFA$post_fa_r)
+clinicalFA$ch_fma<-change(clinicalFA$pre_fma,clinicalFA$post_fma)
+
+clinicalFA$ch_fmi<-change(clinicalFA$pre_fmi,clinicalFA$post_fmi)
+clinicalFA$ch_ifo_l<-change(clinicalFA$pre_ifo_l,clinicalFA$post_ifo_l)
+clinicalFA$ch_ifo_r<-change(clinicalFA$pre_ifo_r,clinicalFA$post_ifo_r)
+clinicalFA$ch_ilf_l<-change(clinicalFA$pre_ilf_l,clinicalFA$post_ilf_l)
+clinicalFA$ch_ilf_r<-change(clinicalFA$pre_ilf_r,clinicalFA$post_ilf_r)
+clinicalFA$ch_mcp<-change(clinicalFA$pre_mcp,clinicalFA$post_mcp)
+clinicalFA$ch_mdlf_l<-change(clinicalFA$pre_mdlf_l,clinicalFA$post_mdlf_l)
+clinicalFA$ch_mdlf_r<-change(clinicalFA$pre_mdlf_r,clinicalFA$post_mdlf_r)
+clinicalFA$ch_or_l<-change(clinicalFA$pre_or_l,clinicalFA$post_or_l)
+clinicalFA$ch_or_r<-change(clinicalFA$pre_or_r,clinicalFA$post_or_r)
+
+clinicalFA$ch_slf1_l<-change(clinicalFA$pre_slf1_l,clinicalFA$post_slf1_l)
+clinicalFA$ch_slf1_r<-change(clinicalFA$pre_slf1_r,clinicalFA$post_slf1_r)
+clinicalFA$ch_slf2_l<-change(clinicalFA$pre_slf2_l,clinicalFA$post_slf2_l)
+clinicalFA$ch_slf2_r<-change(clinicalFA$pre_slf2_r,clinicalFA$post_slf2_r)
+clinicalFA$ch_slf3_l<-change(clinicalFA$pre_slf3_l,clinicalFA$post_slf3_l)
+clinicalFA$ch_slf3_r<-change(clinicalFA$pre_slf3_r,clinicalFA$post_slf3_r)
+
+clinicalFA$ch_str_l<-change(clinicalFA$pre_str_l,clinicalFA$post_str_l)
+clinicalFA$ch_str_r<-change(clinicalFA$pre_str_r,clinicalFA$post_str_r)
+
+
+clinicalFA$ch_uf_l<-change(clinicalFA$pre_uf_l,clinicalFA$post_uf_l)
+clinicalFA$ch_uf_r<-change(clinicalFA$pre_uf_r,clinicalFA$post_uf_r)
+
+clinicalFA$ch_vof_l<-change(clinicalFA$pre_uf_l,clinicalFA$post_vof_l)
+clinicalFA$ch_vof_r<-change(clinicalFA$pre_uf_r,clinicalFA$post_vof_r)
+```
+
+###KFA
+```{r KFA}
+#import KFA data
+KFAdata <- read.csv("C:/Users/aparn/Desktop/ketamine data/258_KFA.csv")
+
+library(tidyr)
+#separate pre and post imaging
+KFApre<-subset(KFAdata, KFAdata$time=="pre")
+KFApost<-subset(KFAdata, KFAdata$time=="post")
+#all 12 have pre and post
+
+#rename columns with pre/post
+colnames(KFApre) [5:46]<- paste0("pre_", colnames(KFApre)[5:46])
+colnames(KFApost) [5:46]<- paste0("post_", colnames(KFApost)[5:46])
+
+library(dplyr)
+
+#join pre and post by number into KFA
+KFA<-left_join(KFApre, KFApost, by="Number")
+
+#join KFA and clinical into clinicalKFA
+clinicalKFA<-left_join(clinical, KFA, by="Number")
+```
+
+```{r change in KFA}
+#ch_whiteMatter column is change in KFA from pre to post; +ve is increase, -ve is decrease  in KFA
+
+clinicalKFA$ch_ac<-change(clinicalKFA$pre_ac,clinicalKFA$post_ac)
+clinicalKFA$ch_af_l<-change(clinicalKFA$pre_af_l,clinicalKFA$post_af_l)
+clinicalKFA$ch_af_r<-change(clinicalKFA$pre_af_r,clinicalKFA$post_af_r)
+clinicalKFA$ch_ar_l<-change(clinicalKFA$pre_ar_l,clinicalKFA$post_ar_l)
+clinicalKFA$ch_ar_r<-change(clinicalKFA$pre_ar_r,clinicalKFA$post_ar_r)
+clinicalKFA$ch_atr_l<-change(clinicalKFA$pre_atr_l,clinicalKFA$post_atr_l)
+clinicalKFA$ch_atr_r<-change(clinicalKFA$pre_atr_r,clinicalKFA$post_atr_r)
+clinicalKFA$ch_cbd_l<-change(clinicalKFA$pre_cbd_l,clinicalKFA$post_cbd_l)
+clinicalKFA$ch_cbd_r<-change(clinicalKFA$pre_cbd_r,clinicalKFA$post_cbd_r)
+clinicalKFA$ch_cbp_l<-change(clinicalKFA$pre_cbp_l,clinicalKFA$post_cbp_l)
+clinicalKFA$ch_cbp_r<-change(clinicalKFA$pre_cbp_r,clinicalKFA$post_cbp_r)
+clinicalKFA$ch_cbt_l<-change(clinicalKFA$pre_cbt_l,clinicalKFA$post_cbt_l)
+clinicalKFA$ch_cbt_r<-change(clinicalKFA$pre_cbt_r,clinicalKFA$post_cbt_r)
+clinicalKFA$ch_cst_l<-change(clinicalKFA$pre_cst_l,clinicalKFA$post_cst_l)
+clinicalKFA$ch_cst_r<-change(clinicalKFA$pre_cst_r,clinicalKFA$post_cst_r)
+clinicalKFA$ch_fa_l<-change(clinicalKFA$pre_fa_l,clinicalKFA$post_fa_l)
+clinicalKFA$ch_fa_r<-change(clinicalKFA$pre_fa_r,clinicalKFA$post_fa_r)
+clinicalKFA$ch_fma<-change(clinicalKFA$pre_fma,clinicalKFA$post_fma)
+
+clinicalKFA$ch_fmi<-change(clinicalKFA$pre_fmi,clinicalKFA$post_fmi)
+clinicalKFA$ch_ifo_l<-change(clinicalKFA$pre_ifo_l,clinicalKFA$post_ifo_l)
+clinicalKFA$ch_ifo_r<-change(clinicalKFA$pre_ifo_r,clinicalKFA$post_ifo_r)
+clinicalKFA$ch_ilf_l<-change(clinicalKFA$pre_ilf_l,clinicalKFA$post_ilf_l)
+clinicalKFA$ch_ilf_r<-change(clinicalKFA$pre_ilf_r,clinicalKFA$post_ilf_r)
+clinicalKFA$ch_mcp<-change(clinicalKFA$pre_mcp,clinicalKFA$post_mcp)
+clinicalKFA$ch_mdlf_l<-change(clinicalKFA$pre_mdlf_l,clinicalKFA$post_mdlf_l)
+clinicalKFA$ch_mdlf_r<-change(clinicalKFA$pre_mdlf_r,clinicalKFA$post_mdlf_r)
+clinicalKFA$ch_or_l<-change(clinicalKFA$pre_or_l,clinicalKFA$post_or_l)
+clinicalKFA$ch_or_r<-change(clinicalKFA$pre_or_r,clinicalKFA$post_or_r)
+
+clinicalKFA$ch_slf1_l<-change(clinicalKFA$pre_slf1_l,clinicalKFA$post_slf1_l)
+clinicalKFA$ch_slf1_r<-change(clinicalKFA$pre_slf1_r,clinicalKFA$post_slf1_r)
+clinicalKFA$ch_slf2_l<-change(clinicalKFA$pre_slf2_l,clinicalKFA$post_slf2_l)
+clinicalKFA$ch_slf2_r<-change(clinicalKFA$pre_slf2_r,clinicalKFA$post_slf2_r)
+clinicalKFA$ch_slf3_l<-change(clinicalKFA$pre_slf3_l,clinicalKFA$post_slf3_l)
+clinicalKFA$ch_slf3_r<-change(clinicalKFA$pre_slf3_r,clinicalKFA$post_slf3_r)
+
+clinicalKFA$ch_str_l<-change(clinicalKFA$pre_str_l,clinicalKFA$post_str_l)
+clinicalKFA$ch_str_r<-change(clinicalKFA$pre_str_r,clinicalKFA$post_str_r)
+
+
+clinicalKFA$ch_uf_l<-change(clinicalKFA$pre_uf_l,clinicalKFA$post_uf_l)
+clinicalKFA$ch_uf_r<-change(clinicalKFA$pre_uf_r,clinicalKFA$post_uf_r)
+
+clinicalKFA$ch_vof_l<-change(clinicalKFA$pre_uf_l,clinicalKFA$post_vof_l)
+clinicalKFA$ch_vof_r<-change(clinicalKFA$pre_uf_r,clinicalKFA$post_vof_r)
+```
+
+###ODI
+```{r ODI}
+#import ODI data
+ODIdata <- read.csv("C:/Users/aparn/Desktop/ketamine data/258_ODI.csv")
+
+library(tidyr)
+#separate pre and post imaging
+ODIpre<-subset(ODIdata, ODIdata$time=="pre")
+ODIpost<-subset(ODIdata, ODIdata$time=="post")
+#all 12 have pre and post
+
+#rename columns with pre/post
+colnames(ODIpre) [5:46]<- paste0("pre_", colnames(ODIpre)[5:46])
+colnames(ODIpost) [5:46]<- paste0("post_", colnames(ODIpost)[5:46])
+
+library(dplyr)
+
+#join pre and post by number into ODI
+ODI<-left_join(ODIpre, ODIpost, by="Number")
+
+#join ODI and clinical into clinicalODI
+clinicalODI<-left_join(clinical, ODI, by="Number")
+```
+
+```{r change in ODI}
+#ch_whiteMatter column is change in ODI from pre to post; +ve is increase, -ve is decrease  in ODI
+
+clinicalODI$ch_ac<-change(clinicalODI$pre_ac,clinicalODI$post_ac)
+clinicalODI$ch_af_l<-change(clinicalODI$pre_af_l,clinicalODI$post_af_l)
+clinicalODI$ch_af_r<-change(clinicalODI$pre_af_r,clinicalODI$post_af_r)
+clinicalODI$ch_ar_l<-change(clinicalODI$pre_ar_l,clinicalODI$post_ar_l)
+clinicalODI$ch_ar_r<-change(clinicalODI$pre_ar_r,clinicalODI$post_ar_r)
+clinicalODI$ch_atr_l<-change(clinicalODI$pre_atr_l,clinicalODI$post_atr_l)
+clinicalODI$ch_atr_r<-change(clinicalODI$pre_atr_r,clinicalODI$post_atr_r)
+clinicalODI$ch_cbd_l<-change(clinicalODI$pre_cbd_l,clinicalODI$post_cbd_l)
+clinicalODI$ch_cbd_r<-change(clinicalODI$pre_cbd_r,clinicalODI$post_cbd_r)
+clinicalODI$ch_cbp_l<-change(clinicalODI$pre_cbp_l,clinicalODI$post_cbp_l)
+clinicalODI$ch_cbp_r<-change(clinicalODI$pre_cbp_r,clinicalODI$post_cbp_r)
+clinicalODI$ch_cbt_l<-change(clinicalODI$pre_cbt_l,clinicalODI$post_cbt_l)
+clinicalODI$ch_cbt_r<-change(clinicalODI$pre_cbt_r,clinicalODI$post_cbt_r)
+clinicalODI$ch_cst_l<-change(clinicalODI$pre_cst_l,clinicalODI$post_cst_l)
+clinicalODI$ch_cst_r<-change(clinicalODI$pre_cst_r,clinicalODI$post_cst_r)
+clinicalODI$ch_fa_l<-change(clinicalODI$pre_fa_l,clinicalODI$post_fa_l)
+clinicalODI$ch_fa_r<-change(clinicalODI$pre_fa_r,clinicalODI$post_fa_r)
+clinicalODI$ch_fma<-change(clinicalODI$pre_fma,clinicalODI$post_fma)
+
+clinicalODI$ch_fmi<-change(clinicalODI$pre_fmi,clinicalODI$post_fmi)
+clinicalODI$ch_ifo_l<-change(clinicalODI$pre_ifo_l,clinicalODI$post_ifo_l)
+clinicalODI$ch_ifo_r<-change(clinicalODI$pre_ifo_r,clinicalODI$post_ifo_r)
+clinicalODI$ch_ilf_l<-change(clinicalODI$pre_ilf_l,clinicalODI$post_ilf_l)
+clinicalODI$ch_ilf_r<-change(clinicalODI$pre_ilf_r,clinicalODI$post_ilf_r)
+clinicalODI$ch_mcp<-change(clinicalODI$pre_mcp,clinicalODI$post_mcp)
+clinicalODI$ch_mdlf_l<-change(clinicalODI$pre_mdlf_l,clinicalODI$post_mdlf_l)
+clinicalODI$ch_mdlf_r<-change(clinicalODI$pre_mdlf_r,clinicalODI$post_mdlf_r)
+clinicalODI$ch_or_l<-change(clinicalODI$pre_or_l,clinicalODI$post_or_l)
+clinicalODI$ch_or_r<-change(clinicalODI$pre_or_r,clinicalODI$post_or_r)
+
+clinicalODI$ch_slf1_l<-change(clinicalODI$pre_slf1_l,clinicalODI$post_slf1_l)
+clinicalODI$ch_slf1_r<-change(clinicalODI$pre_slf1_r,clinicalODI$post_slf1_r)
+clinicalODI$ch_slf2_l<-change(clinicalODI$pre_slf2_l,clinicalODI$post_slf2_l)
+clinicalODI$ch_slf2_r<-change(clinicalODI$pre_slf2_r,clinicalODI$post_slf2_r)
+clinicalODI$ch_slf3_l<-change(clinicalODI$pre_slf3_l,clinicalODI$post_slf3_l)
+clinicalODI$ch_slf3_r<-change(clinicalODI$pre_slf3_r,clinicalODI$post_slf3_r)
+
+clinicalODI$ch_str_l<-change(clinicalODI$pre_str_l,clinicalODI$post_str_l)
+clinicalODI$ch_str_r<-change(clinicalODI$pre_str_r,clinicalODI$post_str_r)
+
+
+clinicalODI$ch_uf_l<-change(clinicalODI$pre_uf_l,clinicalODI$post_uf_l)
+clinicalODI$ch_uf_r<-change(clinicalODI$pre_uf_r,clinicalODI$post_uf_r)
+
+clinicalODI$ch_vof_l<-change(clinicalODI$pre_uf_l,clinicalODI$post_vof_l)
+clinicalODI$ch_vof_r<-change(clinicalODI$pre_uf_r,clinicalODI$post_vof_r)
+```
+
+###ICVF
+```{r ICVF}
+#import ICVF data
+ICVFdata <- read.csv("C:/Users/aparn/Desktop/ketamine data/258_ICVF.csv")
+
+library(tidyr)
+#separate pre and post imaging
+ICVFpre<-subset(ICVFdata, ICVFdata$time=="pre")
+ICVFpost<-subset(ICVFdata, ICVFdata$time=="post")
+#all 12 have pre and post
+
+#rename columns with pre/post
+colnames(ICVFpre) [5:46]<- paste0("pre_", colnames(ICVFpre)[5:46])
+colnames(ICVFpost) [5:46]<- paste0("post_", colnames(ICVFpost)[5:46])
+
+library(dplyr)
+
+#join pre and post by number into ICVF
+ICVF<-left_join(ICVFpre, ICVFpost, by="Number")
+
+#join ICVF and clinical into clinicalICVF
+clinicalICVF<-left_join(clinical, ICVF, by="Number")
+```
+
+```{r change in ICVF}
+#ch_whiteMatter column is change in ICVF from pre to post; +ve is increase, -ve is decrease  in ICVF
+
+clinicalICVF$ch_ac<-change(clinicalICVF$pre_ac,clinicalICVF$post_ac)
+clinicalICVF$ch_af_l<-change(clinicalICVF$pre_af_l,clinicalICVF$post_af_l)
+clinicalICVF$ch_af_r<-change(clinicalICVF$pre_af_r,clinicalICVF$post_af_r)
+clinicalICVF$ch_ar_l<-change(clinicalICVF$pre_ar_l,clinicalICVF$post_ar_l)
+clinicalICVF$ch_ar_r<-change(clinicalICVF$pre_ar_r,clinicalICVF$post_ar_r)
+clinicalICVF$ch_atr_l<-change(clinicalICVF$pre_atr_l,clinicalICVF$post_atr_l)
+clinicalICVF$ch_atr_r<-change(clinicalICVF$pre_atr_r,clinicalICVF$post_atr_r)
+clinicalICVF$ch_cbd_l<-change(clinicalICVF$pre_cbd_l,clinicalICVF$post_cbd_l)
+clinicalICVF$ch_cbd_r<-change(clinicalICVF$pre_cbd_r,clinicalICVF$post_cbd_r)
+clinicalICVF$ch_cbp_l<-change(clinicalICVF$pre_cbp_l,clinicalICVF$post_cbp_l)
+clinicalICVF$ch_cbp_r<-change(clinicalICVF$pre_cbp_r,clinicalICVF$post_cbp_r)
+clinicalICVF$ch_cbt_l<-change(clinicalICVF$pre_cbt_l,clinicalICVF$post_cbt_l)
+clinicalICVF$ch_cbt_r<-change(clinicalICVF$pre_cbt_r,clinicalICVF$post_cbt_r)
+clinicalICVF$ch_cst_l<-change(clinicalICVF$pre_cst_l,clinicalICVF$post_cst_l)
+clinicalICVF$ch_cst_r<-change(clinicalICVF$pre_cst_r,clinicalICVF$post_cst_r)
+clinicalICVF$ch_fa_l<-change(clinicalICVF$pre_fa_l,clinicalICVF$post_fa_l)
+clinicalICVF$ch_fa_r<-change(clinicalICVF$pre_fa_r,clinicalICVF$post_fa_r)
+clinicalICVF$ch_fma<-change(clinicalICVF$pre_fma,clinicalICVF$post_fma)
+
+clinicalICVF$ch_fmi<-change(clinicalICVF$pre_fmi,clinicalICVF$post_fmi)
+clinicalICVF$ch_ifo_l<-change(clinicalICVF$pre_ifo_l,clinicalICVF$post_ifo_l)
+clinicalICVF$ch_ifo_r<-change(clinicalICVF$pre_ifo_r,clinicalICVF$post_ifo_r)
+clinicalICVF$ch_ilf_l<-change(clinicalICVF$pre_ilf_l,clinicalICVF$post_ilf_l)
+clinicalICVF$ch_ilf_r<-change(clinicalICVF$pre_ilf_r,clinicalICVF$post_ilf_r)
+clinicalICVF$ch_mcp<-change(clinicalICVF$pre_mcp,clinicalICVF$post_mcp)
+clinicalICVF$ch_mdlf_l<-change(clinicalICVF$pre_mdlf_l,clinicalICVF$post_mdlf_l)
+clinicalICVF$ch_mdlf_r<-change(clinicalICVF$pre_mdlf_r,clinicalICVF$post_mdlf_r)
+clinicalICVF$ch_or_l<-change(clinicalICVF$pre_or_l,clinicalICVF$post_or_l)
+clinicalICVF$ch_or_r<-change(clinicalICVF$pre_or_r,clinicalICVF$post_or_r)
+
+clinicalICVF$ch_slf1_l<-change(clinicalICVF$pre_slf1_l,clinicalICVF$post_slf1_l)
+clinicalICVF$ch_slf1_r<-change(clinicalICVF$pre_slf1_r,clinicalICVF$post_slf1_r)
+clinicalICVF$ch_slf2_l<-change(clinicalICVF$pre_slf2_l,clinicalICVF$post_slf2_l)
+clinicalICVF$ch_slf2_r<-change(clinicalICVF$pre_slf2_r,clinicalICVF$post_slf2_r)
+clinicalICVF$ch_slf3_l<-change(clinicalICVF$pre_slf3_l,clinicalICVF$post_slf3_l)
+clinicalICVF$ch_slf3_r<-change(clinicalICVF$pre_slf3_r,clinicalICVF$post_slf3_r)
+
+clinicalICVF$ch_str_l<-change(clinicalICVF$pre_str_l,clinicalICVF$post_str_l)
+clinicalICVF$ch_str_r<-change(clinicalICVF$pre_str_r,clinicalICVF$post_str_r)
+
+
+clinicalICVF$ch_uf_l<-change(clinicalICVF$pre_uf_l,clinicalICVF$post_uf_l)
+clinicalICVF$ch_uf_r<-change(clinicalICVF$pre_uf_r,clinicalICVF$post_uf_r)
+
+clinicalICVF$ch_vof_l<-change(clinicalICVF$pre_uf_l,clinicalICVF$post_vof_l)
+clinicalICVF$ch_vof_r<-change(clinicalICVF$pre_uf_r,clinicalICVF$post_vof_r)
+```
+###Basic Analysis
+```{r}
+#subgroups
+rFA<-subset(clinicalFA, response==1)
+nFA<-subset(clinicalFA, response==0)
+#8 non-responders and 4 responders out of 12 subjects
+rKFA<-subset(clinicalFA, response==1)
+nKFA<-subset(clinicalFA, response==0)
+
+rODI<-subset(clinicalFA, response==1)
+nODI<-subset(clinicalFA, response==0)
+
+rICVF<-subset(clinicalFA, response==1)
+nICVF<-subset(clinicalFA, response==0)
+
+#mean percent improvement
+mean(clinicalFA$perc_impr)
+sd(clinicalFA$perc_impr)
+
+mean(rFA$perc_impr)
+sd(rFA$perc_impr)
+
+mean(nFA$perc_impr)
+sd(nFA$perc_impr)
+
+```
+
+###Hypothesis (1): 
+Higher baseline FA in the cingulum and forceps minor will be found for ketamine responders than non-responders.
+
+Analysis: logistic regression: baseline FA and responder/non-responder status
+
+
+```{r Analysis1}
+
+#logistic regression
+
+#forceps minor
+glm1<-glm(response~pre_fmi, data=clinicalFA, family= "binomial")
+summary (glm1)
+
+#cingulum
+glm2<-glm(response~pre_cbp_l, data=clinicalFA, family= "binomial")
+summary (glm2)
+
+glm3<-glm(response~pre_cbp_r, data=clinicalFA, family= "binomial")
+summary (glm3)
+
+glm4<-glm(response~pre_cbt_l, data=clinicalFA, family= "binomial")
+summary (glm4)
+
+glm5<-glm(response~pre_cbt_r, data=clinicalFA, family= "binomial")
+summary (glm5)
+
+glm6<-glm(response~pre_cbd_l, data=clinicalFA, family= "binomial")
+summary (glm6)
+
+glm7<-glm(response~pre_cbd_r, data=clinicalFA, family= "binomial")
+summary (glm7)
+
+
+```
+
+```{r Graphs1}
+library(ggplot2)
+#fmi
+#plot logistic regression curve
+ggplot(clinicalICVF, aes(x=pre_fmi, y=response)) + 
+  geom_point(alpha=.5) +
+  stat_smooth(method="glm", se=FALSE, method.args = list(family=binomial))
+
+ggsave("A.jpg", dpi = 800)
+
+
+```
+
+####Hypothesis (2)
+Baseline FA in the cingulum and left superior longitudinal fasciculus will be positively correlated with their percent improvement in CDRS scores 
+
+Analysis: pearson correlations between percent improvement in CDRS-R and baseline FA
+
+```{r Analysis2}
+#left slf
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_slf1_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_slf2_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_slf3_l)
+#cingulum
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_cbd_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_cbd_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_cbt_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_cbt_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_cbp_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_cbp_r)
+
+
+#new
+
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_ac)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_af_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_af_r)
+
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_ar_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_ar_r)
+
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_atr_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_atr_r)
+
+
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_cst_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_cst_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_fa_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_fa_r)
+
+
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_fmi)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_fma)
+
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_fx_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_fx_r)
+
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_ifo_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_ifo_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_ilf_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_ilf_r)
+
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_mcp)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_mdlf_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_mdlf_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_or_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_or_l)
+
+
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_slf1_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_slf2_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_slf3_r)
+
+
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_str_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_str_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_uf_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_uf_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_vof_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_vof_r)
+#no tracts
+
+```
+
+```{r Graphs2}
+#slf
+ggplot(clinicalFA, aes(perc_impr,pre_slf1_l))+theme_classic()+ geom_point()+geom_smooth(method="lm", se=TRUE)+xlab(label= "Percent Improvement in CDRS-R")+ylab(label="Baseline FA left slf 1")
+ggsave("B.jpg", dpi = 800)
+
+ggplot(clinicalFA, aes(perc_impr,pre_slf2_l))+geom_point()+geom_smooth(method="lm", se=TRUE)
+ggplot(clinicalFA, aes(perc_impr,pre_slf3_l))+geom_point()+geom_smooth(method="lm", se=TRUE)
+#cingulum
+ggplot(clinicalFA, aes(perc_impr,pre_cbd_l))+geom_point()+geom_smooth(method="lm", se=TRUE)
+
+
+ggplot(clinicalFA, aes(perc_impr,pre_cbp_l))+geom_point()+geom_smooth(method="lm", se=TRUE)+theme_classic()+xlab(label= "Percent Improvement in CDRS-R")+ylab(label="Baseline FA left CBP")
+ggsave("C.jpg", dpi = 800)
+
+ggplot(clinicalFA, aes(perc_impr,pre_cbt_l))+geom_point()+geom_smooth(method="lm", se=TRUE)+theme_classic()+xlab(label= "Percent Improvement in CDRS-R")+ylab(label="Baseline FA left CBT")
+ggsave("D.jpg", dpi = 800)
+
+
+```
+
+###Hypothesis (3)
+Participants will experience an increase in FA from pre- to post-ketamine in the left and right inferior longitudinal fasciculus, left superior longitudinal fasciculus, and right uncinate fasciculus.
+
+Analysis: paired samples t-test for variables time of scan (pre or post) and FA value
+
+```{r Analysis3}
+#right uncinate fasciculus
+t.test(clinicalFA$pre_uf_r, clinicalFA$post_uf_r, paired=TRUE)
+#ilf
+t.test(clinicalFA$pre_ilf_r, clinicalFA$post_ilf_r, paired=TRUE)
+t.test(clinicalFA$pre_ilf_l, clinicalFA$post_ilf_l, paired=TRUE)
+
+#slf
+t.test(clinicalFA$pre_slf1_l, clinicalFA$post_slf1_l, paired=TRUE)
+t.test(clinicalFA$pre_slf2_l, clinicalFA$post_slf2_l, paired=TRUE)
+t.test(clinicalFA$pre_slf3_l, clinicalFA$post_slf3_l, paired=TRUE)
+
+#new
+t.test(clinicalFA$pre_slf1_r, clinicalFA$post_slf1_r, paired=TRUE)
+t.test(clinicalFA$pre_slf2_r, clinicalFA$post_slf2_r, paired=TRUE)
+t.test(clinicalFA$pre_slf3_r, clinicalFA$post_slf3_r, paired=TRUE)
+
+
+t.test(clinicalFA$pre_ac, clinicalFA$post_ac, paired=TRUE)
+t.test(clinicalFA$pre_af_r, clinicalFA$post_af_r, paired=TRUE)
+t.test(clinicalFA$pre_af_l, clinicalFA$post_af_l, paired=TRUE)
+t.test(clinicalFA$pre_ar_r, clinicalFA$post_ar_r, paired=TRUE)
+t.test(clinicalFA$pre_ar_l, clinicalFA$post_ar_l, paired=TRUE)
+t.test(clinicalFA$pre_atr_r, clinicalFA$post_atr_r, paired=TRUE)
+t.test(clinicalFA$pre_atr_l, clinicalFA$post_atr_l, paired=TRUE)
+
+t.test(clinicalFA$pre_cbd_r, clinicalFA$post_cbd_r, paired=TRUE)
+t.test(clinicalFA$pre_cbd_l, clinicalFA$post_cbd_l, paired=TRUE)
+t.test(clinicalFA$pre_cbt_r, clinicalFA$post_cbt_r, paired=TRUE)
+t.test(clinicalFA$pre_cbt_l, clinicalFA$post_cbt_l, paired=TRUE)
+t.test(clinicalFA$pre_cbp_r, clinicalFA$post_cbp_r, paired=TRUE)
+t.test(clinicalFA$pre_cbp_l, clinicalFA$post_cbp_l, paired=TRUE)
+
+
+t.test(clinicalFA$pre_cst_r, clinicalFA$post_cst_r, paired=TRUE)
+t.test(clinicalFA$pre_cst_l, clinicalFA$post_cst_l, paired=TRUE)
+t.test(clinicalFA$pre_fa_r, clinicalFA$post_fa_r, paired=TRUE)
+t.test(clinicalFA$pre_fa_l, clinicalFA$post_fa_l, paired=TRUE)
+t.test(clinicalFA$pre_fma, clinicalFA$post_fma, paired=TRUE)
+t.test(clinicalFA$pre_fmi, clinicalFA$post_fmi, paired=TRUE)
+
+
+
+t.test(clinicalFA$pre_ifo_r, clinicalFA$post_ifo_r, paired=TRUE)
+t.test(clinicalFA$pre_ifo_l, clinicalFA$post_ifo_l, paired=TRUE)
+t.test(clinicalFA$pre_ilf_r, clinicalFA$post_ilf_r, paired=TRUE)
+t.test(clinicalFA$pre_ilf_l, clinicalFA$post_ilf_l, paired=TRUE)
+t.test(clinicalFA$pre_mdlf_r, clinicalFA$post_mdlf_r, paired=TRUE)
+t.test(clinicalFA$pre_mdlf_l, clinicalFA$post_mdlf_l, paired=TRUE)
+
+```
+
+```{r Graphs3}
+
+clinicalFA$Number<-as.factor(clinicalFA$Number)
+
+
+#uf
+ggplot(clinicalFA, aes(Number, ch_uf_r))+geom_point()+xlab(label= "Participant")+ylab(label="Change in FA right UF")
+ggsave("E.jpg", dpi = 800)
+
+#ilf_l
+ggplot(clinicalFA, aes(Number, ch_ilf_l))+geom_point()+xlab(label= "Participant")+ylab(label="Change in FA left ILF")
+ggsave("F.jpg", dpi = 800)
+```
+
+###Hypothesis (4)
+Larger changes in FA from pre- to post-ketamine in the corpus callosum-forceps minor and the left and right uncinate fasciculus will be associated with smaller improvements in CDRS-R scores.
+
+Analysis: pearson correlations between percent improvement in CDRS-R and change in FA
+
+
+```{r Analysis4}
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_fmi)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_uf_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_uf_l)
+
+#left slf
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_slf1_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_slf2_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_slf3_l)
+#cingulum
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_cbd_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_cbd_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_cbt_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_cbt_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_cbp_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_cbp_r)
+
+
+#new
+
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_ac)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_af_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_af_r)
+
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_ar_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_ar_r)
+
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_atr_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_atr_r)
+
+
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_cst_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_cst_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_fa_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_fa_r)
+
+
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_fmi)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_fma)
+
+
+
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_ifo_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_ifo_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_ilf_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_ilf_r)
+
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_mcp)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_mdlf_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_mdlf_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_or_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_or_l)
+
+
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_slf1_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_slf2_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_slf3_r)
+
+
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_str_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_str_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_uf_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_uf_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_vof_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$ch_vof_r)
+#no tracts
+``` 
+
+```{r Graphs4}
+
+#NOT RUN, CHANGE
+#fmi
+ggplot(clinicalFA, aes(perc_impr,ch_fmi))+theme_classic()+ geom_point()+geom_smooth(method="lm", se=TRUE)+xlab(label= "Percent Improvement in CDRS-R")+ylab(label="Change in FA FMI")
+ggsave("G.jpg", dpi = 800)
+
+#uf
+ggplot(clinicalFA, aes(perc_impr,ch_uf_r))+theme_classic()+ geom_point()+geom_smooth(method="lm", se=TRUE)+xlab(label= "Percent Improvement in CDRS-R")+ylab(label="Change in FA FMI")
+
+
+
+```
+*EXPLORATORY*
+###exploratory: other tracts for FA
+```{r}
+
+
+#plan: will perform further exploratory analysis for KFA, ODI, ICVF values 
+
+```
+
+*KFA*
+###KFA
+will copy previous code here and change FA to KFA
+
+###Hypothesis (1): 
+Higher baseline FA in the cingulum and forceps minor will be found for ketamine responders than non-responders.
+
+Analysis: logistic regression: baseline FA and responder/non-responder status
+
+
+```{r Analysis1}
+
+#logistic regression
+
+#forceps minor
+glm1<-glm(response~pre_fmi, data=clinicalKFA, family= "binomial")
+summary (glm1)
+
+#cingulum
+glm2<-glm(response~pre_cbp_l, data=clinicalKFA, family= "binomial")
+summary (glm2)
+
+glm3<-glm(response~pre_cbp_r, data=clinicalKFA, family= "binomial")
+summary (glm3)
+
+glm4<-glm(response~pre_cbt_l, data=clinicalKFA, family= "binomial")
+summary (glm4)
+
+glm5<-glm(response~pre_cbt_r, data=clinicalKFA, family= "binomial")
+summary (glm5)
+
+glm6<-glm(response~pre_cbd_l, data=clinicalKFA, family= "binomial")
+summary (glm6)
+
+glm7<-glm(response~pre_cbd_r, data=clinicalKFA, family= "binomial")
+summary (glm7)
+
+
+```
+
+```{r Graphs1}
+library(ggplot2)
+#fmi
+ggplot(clinicalKFA, aes(response,pre_fmi))+geom_bar(stat="Identity")
+
+ggplot(clinicalKFA, aes(response,pre_fmi))+geom_point()+geom_smooth(method="lm", se=TRUE)
+
+#QUESTION: bar graph or scatterlot? I'm guessing bar graph
+
+```
+
+
+####Hypothesis (2)
+Baseline FA in the cingulum and left superior longitudinal fasciculus will be positively correlated with their percent improvement in CDRS scores 
+
+Analysis: pearson correlations between percent improvement in CDRS-R and baseline FA
+
+```{r Analysis2}
+#left slf
+cor.test(clinicalKFA$perc_impr, clinicalKFA$pre_slf1_l)
+cor.test(clinicalKFA$perc_impr, clinicalKFA$pre_slf2_l)
+cor.test(clinicalKFA$perc_impr, clinicalKFA$pre_slf3_l)
+#cingulum
+cor.test(clinicalKFA$perc_impr, clinicalKFA$pre_cbd_l)
+cor.test(clinicalKFA$perc_impr, clinicalKFA$pre_cbd_r)
+cor.test(clinicalKFA$perc_impr, clinicalKFA$pre_cbt_l)
+cor.test(clinicalKFA$perc_impr, clinicalKFA$pre_cbt_r)
+cor.test(clinicalKFA$perc_impr, clinicalKFA$pre_cbp_l)
+cor.test(clinicalKFA$perc_impr, clinicalKFA$pre_cbp_r)
+
+
+#new: do last
+cor.test(clinicalKFA$perc_impr, clinicalFA$pre_slf1_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_slf2_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_slf3_r)
+#no for slf_r
+
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_fmi)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_fma)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_mcp)
+#no for these
+
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_ilf_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_ilf_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_ifo_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_ifo_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_mdlf_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_mdlf_r)
+#no for these
+
+
+```
+
+```{r Graphs2}
+#slf
+ggplot(clinicalFA, aes(perc_impr,pre_slf1_l))+geom_point()+geom_smooth(method="lm", se=TRUE)
+ggplot(clinicalFA, aes(perc_impr,pre_slf2_l))+geom_point()+geom_smooth(method="lm", se=TRUE)
+ggplot(clinicalFA, aes(perc_impr,pre_slf3_l))+geom_point()+geom_smooth(method="lm", se=TRUE)
+#cingulum
+ggplot(clinicalFA, aes(perc_impr,pre_cbd_l))+geom_point()+geom_smooth(method="lm", se=TRUE)
+ggplot(clinicalFA, aes(perc_impr,pre_cbp_l))+geom_point()+geom_smooth(method="lm", se=TRUE)
+ggplot(clinicalFA, aes(perc_impr,pre_cbt_l))+geom_point()+geom_smooth(method="lm", se=TRUE)
+
+
+```
+
+###Hypothesis (3)
+Participants will experience an increase in FA from pre- to post-ketamine in the left and right inferior longitudinal fasciculus, left superior longitudinal fasciculus, and right uncinate fasciculus.
+
+Analysis: paired samples t-test for variables time of scan (pre or post) and FA value
+
+```{r Analysis3}
+#right uncinate fasciculus
+t.test(clinicalKFA$pre_uf_r, clinicalKFA$post_uf_r, paired=TRUE)
+#ilf
+t.test(clinicalKFA$pre_ilf_r, clinicalKFA$post_ilf_r, paired=TRUE)
+t.test(clinicalKFA$pre_ilf_l, clinicalKFA$post_ilf_l, paired=TRUE)
+
+#slf
+t.test(clinicalKFA$pre_slf1_l, clinicalKFA$post_slf1_l, paired=TRUE)
+t.test(clinicalKFA$pre_slf2_l, clinicalKFA$post_slf2_l, paired=TRUE)
+t.test(clinicalKFA$pre_slf3_l, clinicalKFA$post_slf3_l, paired=TRUE)
+```
+
+```{r Graphs3}
+#make clinicalFA long
+
+#uf
+cFAlong1<-pivot_longer(clinicalFA, cols= c("pre_uf_r", "post_uf_r"), names_to = "timePoint", values_to = "FA")
+ggplot(cFAlong1, aes(timePoint, FA))+geom_bar(stat="Identity")
+
+#slf
+cFAlong2<-pivot_longer(clinicalFA, cols= c("pre_slf1_l", "post_slf1_l"), names_to = "timePoint", values_to = "FA")
+ggplot(cFAlong2, aes(timePoint, FA))+geom_bar(stat="Identity")
+
+cFAlong3<-pivot_longer(clinicalFA, cols= c("pre_slf2_l", "post_slf2_l"), names_to = "timePoint", values_to = "FA")
+ggplot(cFAlong3, aes(timePoint, FA))+geom_bar(stat="Identity")
+
+```
+
+###Hypothesis (4)
+Larger changes in FA from pre- to post-ketamine in the corpus callosum-forceps minor and the left and right uncinate fasciculus will be associated with smaller improvements in CDRS-R scores.
+
+Analysis: pearson correlations between percent improvement in CDRS-R and change in FA
+
+
+```{r Analysis4}
+cor.test(clinicalKFA$perc_impr, clinicalKFA$ch_fmi)
+cor.test(clinicalKFA$perc_impr, clinicalKFA$ch_uf_r)
+cor.test(clinicalKFA$perc_impr, clinicalKFA$ch_uf_l)
+``` 
+
+```{r Graphs4}
+#fmi
+ggplot(clinicalFA, aes(perc_impr,ch_fmi))+geom_point()+geom_smooth(method="lm", se=TRUE)
+#uf
+ggplot(clinicalFA, aes(perc_impr,ch_uf_l))+geom_point()+geom_smooth(method="lm", se=TRUE)
+ggplot(clinicalFA, aes(perc_impr,ch_uf_r))+geom_point()+geom_smooth(method="lm", se=TRUE)
+
+```
+
+*ODI*
+###ODI
+
+###Hypothesis (1): 
+Higher baseline FA in the cingulum and forceps minor will be found for ketamine responders than non-responders.
+
+Analysis: logistic regression: baseline FA and responder/non-responder status
+
+
+```{r Analysis1}
+
+
+#forceps minor
+glm1<-glm(response~pre_fmi, data=clinicalODI, family= "binomial")
+summary (glm1)
+
+#cingulum
+glm2<-glm(response~pre_cbp_l, data=clinicalODI, family= "binomial")
+summary (glm2)
+
+glm3<-glm(response~pre_cbp_r, data=clinicalODI, family= "binomial")
+summary (glm3)
+
+glm4<-glm(response~pre_cbt_l, data=clinicalODI, family= "binomial")
+summary (glm4)
+
+glm5<-glm(response~pre_cbt_r, data=clinicalODI, family= "binomial")
+summary (glm5)
+
+glm6<-glm(response~pre_cbd_l, data=clinicalODI, family= "binomial")
+summary (glm6)
+
+glm7<-glm(response~pre_cbd_r, data=clinicalODI, family= "binomial")
+summary (glm7)
+
+
+```
+
+```{r Graphs1}
+library(ggplot2)
+
+
+
+```
+
+
+####Hypothesis (2)
+Baseline FA in the cingulum and left superior longitudinal fasciculus will be positively correlated with their percent improvement in CDRS scores 
+
+Analysis: pearson correlations between percent improvement in CDRS-R and baseline FA
+
+```{r Analysis2}
+#left slf
+cor.test(clinicalODI$perc_impr, clinicalODI$pre_slf1_l)
+cor.test(clinicalODI$perc_impr, clinicalODI$pre_slf2_l)
+cor.test(clinicalODI$perc_impr, clinicalODI$pre_slf3_l)
+#cingulum
+cor.test(clinicalODI$perc_impr, clinicalODI$pre_cbd_l)
+cor.test(clinicalODI$perc_impr, clinicalODI$pre_cbd_r)
+cor.test(clinicalODI$perc_impr, clinicalODI$pre_cbt_l)
+cor.test(clinicalODI$perc_impr, clinicalODI$pre_cbt_r)
+cor.test(clinicalODI$perc_impr, clinicalODI$pre_cbp_l)
+cor.test(clinicalODI$perc_impr, clinicalODI$pre_cbp_r)
+
+
+#new: do last
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_slf1_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_slf2_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_slf3_r)
+#no for slf_r
+
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_fmi)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_fma)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_mcp)
+#no for these
+
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_ilf_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_ilf_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_ifo_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_ifo_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_mdlf_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_mdlf_r)
+#no for these
+
+
+```
+
+```{r Graphs2}
+#slf
+ggplot(clinicalFA, aes(perc_impr,pre_slf1_l))+geom_point()+geom_smooth(method="lm", se=TRUE)
+ggplot(clinicalFA, aes(perc_impr,pre_slf2_l))+geom_point()+geom_smooth(method="lm", se=TRUE)
+ggplot(clinicalFA, aes(perc_impr,pre_slf3_l))+geom_point()+geom_smooth(method="lm", se=TRUE)
+#cingulum
+ggplot(clinicalFA, aes(perc_impr,pre_cbd_l))+geom_point()+geom_smooth(method="lm", se=TRUE)
+ggplot(clinicalFA, aes(perc_impr,pre_cbp_l))+geom_point()+geom_smooth(method="lm", se=TRUE)
+ggplot(clinicalFA, aes(perc_impr,pre_cbt_l))+geom_point()+geom_smooth(method="lm", se=TRUE)
+
+
+```
+
+###Hypothesis (3)
+Participants will experience an increase in FA from pre- to post-ketamine in the left and right inferior longitudinal fasciculus, left superior longitudinal fasciculus, and right uncinate fasciculus.
+
+Analysis: paired samples t-test for variables time of scan (pre or post) and FA value
+
+```{r Analysis3}
+#right uncinate fasciculus
+t.test(clinicalODI$pre_uf_r, clinicalODI$post_uf_r, paired=TRUE)
+#ilf
+t.test(clinicalODI$pre_ilf_r, clinicalODI$post_ilf_r, paired=TRUE)
+t.test(clinicalODI$pre_ilf_l, clinicalODI$post_ilf_l, paired=TRUE)
+
+#slf
+t.test(clinicalODI$pre_slf1_l, clinicalODI$post_slf1_l, paired=TRUE)
+t.test(clinicalODI$pre_slf2_l, clinicalODI$post_slf2_l, paired=TRUE)
+t.test(clinicalODI$pre_slf3_l, clinicalODI$post_slf3_l, paired=TRUE)
+```
+
+```{r Graphs3}
+#make clinicalFA long
+
+#uf
+cFAlong1<-pivot_longer(clinicalFA, cols= c("pre_uf_r", "post_uf_r"), names_to = "timePoint", values_to = "FA")
+ggplot(cFAlong1, aes(timePoint, FA))+geom_bar(stat="Identity")
+
+#slf
+cFAlong2<-pivot_longer(clinicalFA, cols= c("pre_slf1_l", "post_slf1_l"), names_to = "timePoint", values_to = "FA")
+ggplot(cFAlong2, aes(timePoint, FA))+geom_bar(stat="Identity")
+
+cFAlong3<-pivot_longer(clinicalFA, cols= c("pre_slf2_l", "post_slf2_l"), names_to = "timePoint", values_to = "FA")
+ggplot(cFAlong3, aes(timePoint, FA))+geom_bar(stat="Identity")
+
+```
+
+###Hypothesis (4)
+Larger changes in FA from pre- to post-ketamine in the corpus callosum-forceps minor and the left and right uncinate fasciculus will be associated with smaller improvements in CDRS-R scores.
+
+Analysis: pearson correlations between percent improvement in CDRS-R and change in FA
+
+
+```{r Analysis4}
+cor.test(clinicalODI$perc_impr, clinicalODI$ch_fmi)
+cor.test(clinicalODI$perc_impr, clinicalODI$ch_uf_r)
+cor.test(clinicalODI$perc_impr, clinicalODI$ch_uf_l)
+``` 
+
+```{r Graphs4}
+#fmi
+ggplot(clinicalFA, aes(perc_impr,ch_fmi))+geom_point()+geom_smooth(method="lm", se=TRUE)
+#uf
+ggplot(clinicalFA, aes(perc_impr,ch_uf_l))+geom_point()+geom_smooth(method="lm", se=TRUE)
+ggplot(clinicalFA, aes(perc_impr,ch_uf_r))+geom_point()+geom_smooth(method="lm", se=TRUE)
+
+```
+
+*ICVF*
+###ICVF
+
+###Hypothesis (1): 
+Higher baseline FA in the cingulum and forceps minor will be found for ketamine responders than non-responders.
+
+Analysis: logistic regression: baseline FA and responder/non-responder status
+
+
+```{r Analysis1}
+
+
+#forceps minor
+glm1<-glm(response~pre_fmi, data=clinicalICVF, family= "binomial")
+summary (glm1)
+
+#cingulum
+glm2<-glm(response~pre_cbp_l, data=clinicalICVF, family= "binomial")
+summary (glm2)
+
+glm3<-glm(response~pre_cbp_r, data=clinicalICVF, family= "binomial")
+summary (glm3)
+
+glm4<-glm(response~pre_cbt_l, data=clinicalICVF, family= "binomial")
+summary (glm4)
+
+glm5<-glm(response~pre_cbt_r, data=clinicalICVF, family= "binomial")
+summary (glm5)
+
+glm6<-glm(response~pre_cbd_l, data=clinicalICVF, family= "binomial")
+summary (glm6)
+
+glm7<-glm(response~pre_cbd_r, data=clinicalICVF, family= "binomial")
+summary (glm7)
+
+
+```
+
+```{r Graphs1}
+library(ggplot2)
+
+#fmi
+
+#plot logistic regression curve
+ggplot(clinicalICVF, aes(x=pre_fmi, y=response)) + 
+  geom_point(alpha=.5) +
+  stat_smooth(method="glm", se=FALSE, method.args = list(family=binomial))
+
+
+```
+
+
+
+####Hypothesis (2)
+Baseline FA in the cingulum and left superior longitudinal fasciculus will be positively correlated with their percent improvement in CDRS scores 
+
+Analysis: pearson correlations between percent improvement in CDRS-R and baseline FA
+
+```{r Analysis2}
+#left slf
+cor.test(clinicalICVF$perc_impr, clinicalICVF$pre_slf1_l)
+cor.test(clinicalICVF$perc_impr, clinicalICVF$pre_slf2_l)
+cor.test(clinicalICVF$perc_impr, clinicalICVF$pre_slf3_l)
+#cingulum
+cor.test(clinicalICVF$perc_impr, clinicalICVF$pre_cbd_l)
+cor.test(clinicalICVF$perc_impr, clinicalICVF$pre_cbd_r)
+cor.test(clinicalICVF$perc_impr, clinicalICVF$pre_cbt_l)
+cor.test(clinicalICVF$perc_impr, clinicalICVF$pre_cbt_r)
+cor.test(clinicalICVF$perc_impr, clinicalICVF$pre_cbp_l)
+cor.test(clinicalICVF$perc_impr, clinicalICVF$pre_cbp_r)
+
+
+#new: do last
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_slf1_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_slf2_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_slf3_r)
+#no for slf_r
+
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_fmi)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_fma)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_mcp)
+#no for these
+
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_ilf_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_ilf_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_ifo_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_ifo_r)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_mdlf_l)
+cor.test(clinicalFA$perc_impr, clinicalFA$pre_mdlf_r)
+#no for these
+
+
+```
+
+```{r Graphs2}
+#slf
+ggplot(clinicalFA, aes(perc_impr,pre_slf1_l))+geom_point()+geom_smooth(method="lm", se=TRUE)
+ggplot(clinicalFA, aes(perc_impr,pre_slf2_l))+geom_point()+geom_smooth(method="lm", se=TRUE)
+ggplot(clinicalFA, aes(perc_impr,pre_slf3_l))+geom_point()+geom_smooth(method="lm", se=TRUE)
+#cingulum
+ggplot(clinicalFA, aes(perc_impr,pre_cbd_l))+geom_point()+geom_smooth(method="lm", se=TRUE)
+ggplot(clinicalFA, aes(perc_impr,pre_cbp_l))+geom_point()+geom_smooth(method="lm", se=TRUE)
+ggplot(clinicalFA, aes(perc_impr,pre_cbt_l))+geom_point()+geom_smooth(method="lm", se=TRUE)
+
+
+```
+
+###Hypothesis (3)
+Participants will experience an increase in FA from pre- to post-ketamine in the left and right inferior longitudinal fasciculus, left superior longitudinal fasciculus, and right uncinate fasciculus.
+
+Analysis: paired samples t-test for variables time of scan (pre or post) and FA value
+
+```{r Analysis3}
+#right uncinate fasciculus
+t.test(clinicalICVF$pre_uf_r, clinicalICVF$post_uf_r, paired=TRUE)
+#ilf
+t.test(clinicalICVF$pre_ilf_r, clinicalICVF$post_ilf_r, paired=TRUE)
+t.test(clinicalICVF$pre_ilf_l, clinicalICVF$post_ilf_l, paired=TRUE)
+
+#slf
+t.test(clinicalICVF$pre_slf1_l, clinicalICVF$post_slf1_l, paired=TRUE)
+t.test(clinicalICVF$pre_slf2_l, clinicalICVF$post_slf2_l, paired=TRUE)
+t.test(clinicalICVF$pre_slf3_l, clinicalICVF$post_slf3_l, paired=TRUE)
+```
+
+```{r Graphs3}
+#make clinicalFA long
+
+#uf
+cFAlong1<-pivot_longer(clinicalFA, cols= c("pre_uf_r", "post_uf_r"), names_to = "timePoint", values_to = "FA")
+ggplot(cFAlong1, aes(timePoint, FA))+geom_bar(stat="Identity")
+
+#slf
+cFAlong2<-pivot_longer(clinicalFA, cols= c("pre_slf1_l", "post_slf1_l"), names_to = "timePoint", values_to = "FA")
+ggplot(cFAlong2, aes(timePoint, FA))+geom_bar(stat="Identity")
+
+cFAlong3<-pivot_longer(clinicalFA, cols= c("pre_slf2_l", "post_slf2_l"), names_to = "timePoint", values_to = "FA")
+ggplot(cFAlong3, aes(timePoint, FA))+geom_bar(stat="Identity")
+
+```
+
+###Hypothesis (4)
+Larger changes in FA from pre- to post-ketamine in the corpus callosum-forceps minor and the left and right uncinate fasciculus will be associated with smaller improvements in CDRS-R scores.
+
+Analysis: pearson correlations between percent improvement in CDRS-R and change in FA
+
+
+```{r Analysis4}
+cor.test(clinicalICVF$perc_impr, clinicalICVF$ch_fmi)
+cor.test(clinicalICVF$perc_impr, clinicalICVF$ch_uf_r)
+cor.test(clinicalICVF$perc_impr, clinicalICVF$ch_uf_l)
+``` 
+
+```{r Graphs4}
+#fmi
+ggplot(clinicalFA, aes(perc_impr,ch_fmi))+geom_point()+geom_smooth(method="lm", se=TRUE)
+#uf
+ggplot(clinicalFA, aes(perc_impr,ch_uf_l))+geom_point()+geom_smooth(method="lm", se=TRUE)
+ggplot(clinicalFA, aes(perc_impr,ch_uf_r))+geom_point()+geom_smooth(method="lm", se=TRUE)
+
+```
+
